@@ -1,4 +1,8 @@
 This is the 2nd requirement
 edited this file
+<<<<<<< Updated upstream
 Requirement for 004
 
+=======
+editing this file for stashing
+>>>>>>> Stashed changes
