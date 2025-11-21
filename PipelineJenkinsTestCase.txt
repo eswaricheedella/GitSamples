@@ -1,0 +1,48 @@
+pipeline {
+    agent any
+
+    tools {
+        // Install the Maven version configured as "M3" and add it to the path.
+        maven "MyMvn"
+        jdk "MyJdk"
+        git "MyGit"
+    }
+
+    stages {
+        stage('Build & Deploy') {
+            steps {
+                // Get some code from a GitHub repository
+                git credentialsId: '8135dc13-f188-4165-9fb5-7284133b5d5f', 
+                url: 'https://github.com/eswaricheedella/MavenWebAppOne.git'
+
+
+                // Run Maven on a Unix agent.
+                //sh "mvn -Dmaven.test.failure.ignore=true clean package"
+
+                // To run Maven on a Windows agent, use
+                bat "mvn -Dmaven.test.failure.ignore=true clean package"
+            }
+
+            post {
+               // If Maven was able to run the tests, even if some of the test
+               // failed, record the test results and archive the jar file.
+                success {
+                    deploy adapters: [tomcat9(alternativeDeploymentContext: '', 
+                    credentialsId: '7b22b684-9570-4aec-b3aa-ad65a9444474', 
+                    path: '', 
+                    url: 'http://localhost:8080/')], 
+                    contextPath: 'MavenWebAppOne', war: '**/*.war'
+                }
+            }
+        }
+        stage('PetStoreTest') {
+            steps{
+                git credentialsId: '8135dc13-f188-4165-9fb5-7284133b5d5f', 
+                url: 'https://github.com/eswaricheedella/MavenWebAppTest.git'
+
+                bat "mvn test"
+            }
+        }
+        
+    }
+}
